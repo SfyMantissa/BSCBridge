@@ -49,7 +49,11 @@ const config: HardhatUserConfig = {
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_KEY ?? ""
+    apiKey: {
+      rinkeby: process.env.ETHERSCAN_KEY ?? "",
+      bscTestnet: process.env.BSCSCAN_KEY ?? ""
+    }
   }
-};
+}
+
 export default config;
