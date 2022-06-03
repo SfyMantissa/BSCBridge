@@ -1,4 +1,4 @@
-# Rinkeby-BNBT ERC20 Token Bridge 🌉
+# BNBT-Rinkeby ERC20 Token Bridge 🌉
 
 A BNBT-Rinkeby blockchain bridge implementation for a sample ERC20 token. 
 
