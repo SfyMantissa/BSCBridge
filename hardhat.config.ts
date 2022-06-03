@@ -37,7 +37,7 @@ const config: HardhatUserConfig = {
         process.env.ACCOUNT3_KEY ?? ""
       ],
     },
-    bsc_testnet: {
+    bnbt: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       gasPrice: 20000000000,

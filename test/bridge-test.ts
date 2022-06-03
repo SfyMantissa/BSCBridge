@@ -17,15 +17,15 @@ describe("Bridge", () => {
 
     const Bridge = await ethers.getContractFactory("Bridge");
     bridge = await Bridge.deploy(
-      config.YAC_ETH_ADDRESS
+      config.YAC_RINKEBY_ADDRESS
     );
     await bridge.deployed();
 
     const YetAnotherCoin = await ethers.getContractFactory("YetAnotherCoin");
-    yetAnotherCoin = YetAnotherCoin.attach(config.YAC_ETH_ADDRESS);
+    yetAnotherCoin = YetAnotherCoin.attach(config.YAC_RINKEBY_ADDRESS);
   });
 
-  it("swap: should be able to initiate the swap of 10 YAC tokens owner → user", async () => {
+  it("swap: should be able to initiate the swap of 10 YAC tokens", async () => {
     await yetAnotherCoin.connect(owner).mint(owner.address, 1000);
 
     const txSwap = bridge.connect(owner).swap(10);

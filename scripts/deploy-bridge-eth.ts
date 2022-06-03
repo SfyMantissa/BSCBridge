@@ -6,15 +6,15 @@ const updateDeploymentAddress = async (address: string) => {
   let config: string = './config.ts';
   fs.readFile(config, 'utf-8', (err: unknown, data: string) => {
     if (err) throw err;
-    let regex = /BRIDGE_ETH_ADDRESS: ".*",/g;
+    let regex = /BRIDGE_RINKEBY_ADDRESS: ".*",/g;
     let update = data.replace(
       regex,
-      'BRIDGE_ETH_ADDRESS: "' + address + '",'
+      'BRIDGE_RINKEBY_ADDRESS: "' + address + '",'
     );
 
     fs.writeFile(config, update, 'utf-8', (err: unknown) => {
       if (err) throw err;
-      console.log('Updated BRIDGE_ETH_ADDRESS in config.ts.');
+      console.log('Updated BRIDGE_RINKEBY_ADDRESS in config.ts.');
     });
   });
 };
@@ -22,7 +22,7 @@ const updateDeploymentAddress = async (address: string) => {
 const main = async () => {
   const Bridge = await ethers.getContractFactory("Bridge");
   const bridge = await Bridge.deploy(
-    config.YAC_ETH_ADDRESS
+    config.YAC_RINKEBY_ADDRESS
   );
   await bridge.deployed();
   console.log("Bridge deployed to:", bridge.address);

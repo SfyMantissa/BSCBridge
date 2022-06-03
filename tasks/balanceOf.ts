@@ -5,27 +5,27 @@ import config from '../config';
 task("balanceOf",
   "Get the balance YAC of the account in the ETH/BSC networks.")
   .addParam("signer", "ID of the signer used to make the call.")
-  .addParam("blockchain", "Blockchain (ETH or BSC).")
   .setAction(async (args, { ethers }) => {
 
-    let blockchain: string;
-
-    if (args.blockchain === "ETH") {
-      blockchain = config.YAC_ETH_ADDRESS;
-    } else if (args.blockchain === "BSC") {
-      blockchain = config.YAC_BSC_ADDRESS;
-    } else {
-      throw "ERROR: Blockchain must be ETH or BSC."
-    }
-
+    let tokenAddress: string;
+    const network = await ethers.provider.getNetwork();
     const signerArray = await ethers.getSigners();
 
+    if (network.chainId === 4) {
+      tokenAddress = config.YAC_RINKEBY_ADDRESS;
+    } else if (network.chainId === 97) {
+      tokenAddress = config.YAC_BNBT_ADDRESS;
+    } else {
+      throw "ERROR: Network must be Rinkeby or BNBT."
+    }
+
     const YetAnotherCoin = await ethers.getContractFactory("YetAnotherCoin");
-    const yetAnotherCoin = YetAnotherCoin.attach(blockchain);
+    const yetAnotherCoin = YetAnotherCoin.attach(tokenAddress);
     const balanceOf = await yetAnotherCoin.balanceOf(
       signerArray[args.signer].address
     );
+
     console.log(signerArray[args.signer].address + " has " + balanceOf
-      + " of YAC tokens on the " + args.blockchain + " chain.");
+      + " of YAC tokens on the " + network.name.toUpperCase() + " chain.");
   });
 

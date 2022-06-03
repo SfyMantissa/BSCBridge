@@ -6,15 +6,15 @@ import "./YetAnotherCoin.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-/// @title A BSC-ETH blockchain bridge implementation for 
-///        a sample ERC-20 token. 
+/// @title A BNBT-Rinkeby blockchain bridge implementation for a sample
+///        ERC20 token. 
 /// @author Sfy Mantissa
 contract Bridge {
 
   using Counters for Counters.Counter;
   using ECDSA for bytes32;
 
-  /// @dev ERC-20 token interface used.
+  /// @dev ERC20 token interface used.
   IYetAnotherCoin public token;
 
   /// @dev Initiating the bridge transaction counter.
@@ -31,7 +31,7 @@ contract Bridge {
     bool isRedeem
   );
 
-  /// @dev YAC token address may be different for BSC/ETH networks, so
+  /// @dev YAC token address may be different for BNBT/Rinkeby networks, so
   ///      it's set in the constructor.
   constructor(address _tokenAddress) {
     token = IYetAnotherCoin(_tokenAddress);

@@ -2,7 +2,7 @@
 
 *Sfy Mantissa*
 
-> A BSC-ETH blockchain bridge implementation for         a sample ERC-20 token. 
+> A BNBT-Rinkeby blockchain bridge implementation for a sample        ERC20 token. 
 
 
 
@@ -91,7 +91,7 @@ function token() external view returns (contract IYetAnotherCoin)
 
 
 
-*ERC-20 token interface used.*
+*ERC20 token interface used.*
 
 
 #### Returns
