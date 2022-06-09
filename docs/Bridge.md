@@ -52,7 +52,7 @@ function nonceIsUsed(uint256) external view returns (bool)
 ### redeem
 
 ```solidity
-function redeem(bytes _signature, uint256 _amount, uint256 _nonce) external nonpayable
+function redeem(address _sender, bytes _signature, uint256 _amount, uint256 _nonce) external nonpayable
 ```
 
 End the swap and mint `_amount` of YAC tokens to the caller          address, verifying the request with `_signature` and `_nounce`.
@@ -63,6 +63,7 @@ End the swap and mint `_amount` of YAC tokens to the caller          address, ve
 
 | Name | Type | Description |
 |---|---|---|
+| _sender | address | The sender&#39;s address. |
 | _signature | bytes | Signed message hash. |
 | _amount | uint256 | The amount of YAC tokens to be transferred. |
 | _nonce | uint256 | Bridge operation counter value. |
@@ -70,7 +71,7 @@ End the swap and mint `_amount` of YAC tokens to the caller          address, ve
 ### swap
 
 ```solidity
-function swap(uint256 _amount) external nonpayable
+function swap(address _recepient, uint256 _amount) external nonpayable
 ```
 
 Start the swap and burn `_amount` of YAC tokens from         the caller&#39;s address.
@@ -81,6 +82,7 @@ Start the swap and burn `_amount` of YAC tokens from         the caller&#39;s ad
 
 | Name | Type | Description |
 |---|---|---|
+| _recepient | address | The recepient&#39;s address. |
 | _amount | uint256 | The quantity of tokens to be burned in the first network. |
 
 ### token
@@ -107,7 +109,7 @@ function token() external view returns (contract IYetAnotherCoin)
 ### SwapInitialized
 
 ```solidity
-event SwapInitialized(address user, uint256 amount, uint256 nonce, bool isRedeem)
+event SwapInitialized(address sender, address recepient, uint256 amount, uint256 nonce, bool isRedeem)
 ```
 
 
@@ -118,7 +120,8 @@ event SwapInitialized(address user, uint256 amount, uint256 nonce, bool isRedeem
 
 | Name | Type | Description |
 |---|---|---|
-| user  | address | undefined |
+| sender  | address | undefined |
+| recepient  | address | undefined |
 | amount  | uint256 | undefined |
 | nonce  | uint256 | undefined |
 | isRedeem  | bool | undefined |

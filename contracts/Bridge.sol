@@ -25,7 +25,8 @@ contract Bridge {
 
   /// @dev Triggers both upon `swap` and `redeem`.
   event SwapInitialized (
-    address user,
+    address sender,
+    address recepient,
     uint256 amount,
     uint256 nonce,
     bool isRedeem
@@ -39,14 +40,16 @@ contract Bridge {
 
   /// @notice Start the swap and burn `_amount` of YAC tokens from
   ///         the caller's address.
+  /// @param _recepient The recepient's address.
   /// @param _amount The quantity of tokens to be burned in the first network.
-  function swap(uint256 _amount)
+  function swap(address _recepient, uint256 _amount)
     external
   {
     token.burn(msg.sender, _amount);
 
     emit SwapInitialized(
       msg.sender,
+      _recepient,
       _amount,
       nonce.current(),
       false
@@ -59,10 +62,12 @@ contract Bridge {
   ///         address, verifying the request with `_signature` and `_nounce`.
   /// @dev ECDSA library is used to check whether the transaction was signed
   ///      by the caller.
+  /// @param _sender The sender's address.
   /// @param _signature Signed message hash.
   /// @param _amount The amount of YAC tokens to be transferred.
   /// @param _nonce Bridge operation counter value.
   function redeem(
+    address _sender,
     bytes calldata _signature,
     uint256 _amount,
     uint256 _nonce
@@ -79,6 +84,7 @@ contract Bridge {
 
     bytes32 signature = keccak256(
       abi.encodePacked(
+        _sender,
         msg.sender,
         address(this),
         _amount,
@@ -97,6 +103,7 @@ contract Bridge {
     token.mint(msg.sender, _amount);
 
     emit SwapInitialized(
+      _sender,
       msg.sender,
       _amount,
       _nonce,
