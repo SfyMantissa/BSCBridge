@@ -23,6 +23,7 @@ A BNBT-Rinkeby blockchain bridge implementation for a sample ERC20 token.
 - [ ] Use token pools instead of burn() and mint()
 - [ ] Take commissions for swaps
 - [x] Add sender and recepient
+- [ ] (critical) Authorize the use by non-user signatures
 
 ## Usage
 
