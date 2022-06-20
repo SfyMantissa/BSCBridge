@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
-import "hardhat/console.sol";
 
 /// @title A BNBT-Rinkeby blockchain bridge implementation for a sample
 ///        ERC20 token.
@@ -22,18 +21,22 @@ contract Bridge is EIP712, Ownable {
   /// @dev Initiating the bridge transaction counter.
   Counters.Counter public nonce;
 
+  /// @dev Commission percentage when swap amount >= 100 tokens.
   uint256 public commissionPercentage;
 
+  /// @dev Comission absolute value when swap amount < 100 tokens.
   uint256 public lowCommission;
 
   /// @dev Used to prevent nonce collisions.
   mapping(uint256 => bool) public nonceIsUsed;
 
+  /// @dev Typehash for EIP-712 compliant hashStruct.
   bytes32 public constant SWAP_TYPEHASH =
     keccak256(
       "Swap(address sender,address recipient,uint256 amount,uint256 nonce,bool isRedeem)"
     );
 
+  /// @dev Type for hashStruct.
   struct SwapStruct {
     address sender;
     address recipient;
@@ -63,28 +66,9 @@ contract Bridge is EIP712, Ownable {
     lowCommission = _lowCommission;
   }
 
-  function _hash(SwapStruct memory _swap) internal view returns (bytes32) {
-    return
-      _hashTypedDataV4(
-        keccak256(
-          abi.encode(
-            SWAP_TYPEHASH,
-            _swap.sender,
-            _swap.recipient,
-            _swap.amount,
-            _swap.nonce,
-            _toUInt256(_swap.isRedeem)
-          )
-        )
-      );
-  }
-
-  function _toUInt256(bool x) internal pure returns (uint256 r) {
-    assembly {
-      r := x
-    }
-  }
-
+  /// @dev Change the commission percentage.
+  ///      Can only be called by the owner.
+  /// @param _commissionPercentage New commission percentage.
   function setCommissionPercentage(uint256 _commissionPercentage)
     external
     onlyOwner
@@ -92,6 +76,9 @@ contract Bridge is EIP712, Ownable {
     commissionPercentage = _commissionPercentage;
   }
 
+  /// @dev Change the the commission amount for swaps with < 100 tokens.
+  ///      Can only be called by the owner.
+  /// @param _lowCommission New commission amount.
   function setLowCommission(uint256 _lowCommission) external onlyOwner {
     lowCommission = _lowCommission;
   }
@@ -154,5 +141,27 @@ contract Bridge is EIP712, Ownable {
       _swap.nonce,
       _swap.isRedeem
     );
+  }
+
+  function _hash(SwapStruct memory _swap) internal view returns (bytes32) {
+    return
+      _hashTypedDataV4(
+        keccak256(
+          abi.encode(
+            SWAP_TYPEHASH,
+            _swap.sender,
+            _swap.recipient,
+            _swap.amount,
+            _swap.nonce,
+            _toUInt256(_swap.isRedeem)
+          )
+        )
+      );
+  }
+
+  function _toUInt256(bool x) internal pure returns (uint256 r) {
+    assembly {
+      r := x
+    }
   }
 }

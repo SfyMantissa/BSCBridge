@@ -18,7 +18,7 @@ function SWAP_TYPEHASH() external view returns (bytes32)
 
 
 
-
+*Typehash for EIP-712 compliant hashStruct.*
 
 
 #### Returns
@@ -35,7 +35,7 @@ function commissionPercentage() external view returns (uint256)
 
 
 
-
+*Commission percentage when swap amount &gt;= 100 tokens.*
 
 
 #### Returns
@@ -52,7 +52,7 @@ function lowCommission() external view returns (uint256)
 
 
 
-
+*Comission absolute value when swap amount &lt; 100 tokens.*
 
 
 #### Returns
@@ -155,13 +155,13 @@ function setCommissionPercentage(uint256 _commissionPercentage) external nonpaya
 
 
 
-
+*Change the commission percentage.      Can only be called by the owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _commissionPercentage | uint256 | undefined |
+| _commissionPercentage | uint256 | New commission percentage. |
 
 ### setLowCommission
 
@@ -171,13 +171,13 @@ function setLowCommission(uint256 _lowCommission) external nonpayable
 
 
 
-
+*Change the the commission amount for swaps with &lt; 100 tokens.      Can only be called by the owner.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _lowCommission | uint256 | undefined |
+| _lowCommission | uint256 | New commission amount. |
 
 ### swap
 
