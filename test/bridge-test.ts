@@ -37,7 +37,6 @@ describe("Bridge", () => {
         { name: "recipient", type: "address" },
         { name: "amount", type: "uint256" },
         { name: "nonce", type: "uint256" },
-        { name: "isRedeem", type: "bool" },
       ],
     };
   });
@@ -57,11 +56,11 @@ describe("Bridge", () => {
 
     await expect(bridge.connect(owner).swap(owner.address, 10))
       .to.emit(bridge, "Swap")
-      .withArgs(owner.address, owner.address, 10, 0, false);
+      .withArgs(owner.address, owner.address, 10, 0);
 
     await expect(bridge.connect(owner).swap(owner.address, 200))
       .to.emit(bridge, "Swap")
-      .withArgs(owner.address, owner.address, 200, 1, false);
+      .withArgs(owner.address, owner.address, 200, 1);
 
     expect(
       await yetAnotherCoin.connect(owner).balanceOf(owner.address)
@@ -74,7 +73,6 @@ describe("Bridge", () => {
       recipient: owner.address,
       amount: 10,
       nonce: 0,
-      isRedeem: true,
     };
 
     let signature = await owner._signTypedData(domain, types, value);
@@ -85,13 +83,13 @@ describe("Bridge", () => {
         .connect(owner)
         .redeem(value.sender, signature, value.amount, value.nonce)
     )
-      .to.emit(bridge, "Swap")
+      .to.emit(bridge, "Redeem")
       .withArgs(
         value.sender,
         owner.address,
         value.amount - commission,
         value.nonce,
-        value.isRedeem
+        commission
       );
 
     totalCommissioned += parseFloat(commission);
@@ -107,7 +105,6 @@ describe("Bridge", () => {
       recipient: owner.address,
       amount: 200,
       nonce: 1,
-      isRedeem: true,
     };
 
     let signature = await owner._signTypedData(domain, types, value);
@@ -119,13 +116,13 @@ describe("Bridge", () => {
         .connect(owner)
         .redeem(value.sender, signature, value.amount, value.nonce)
     )
-      .to.emit(bridge, "Swap")
+      .to.emit(bridge, "Redeem")
       .withArgs(
         value.sender,
         owner.address,
         value.amount - commission,
         value.nonce,
-        value.isRedeem
+        commission
       );
 
     totalCommissioned += commission;
@@ -151,7 +148,6 @@ describe("Bridge", () => {
       recipient: owner.address,
       amount: 11,
       nonce: 2,
-      isRedeem: true,
     };
 
     let signature = await owner._signTypedData(domain, types, value);

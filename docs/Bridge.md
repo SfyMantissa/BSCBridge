@@ -254,7 +254,7 @@ function withdraw() external nonpayable
 
 
 
-
+*Withdraw all the commissioned tokens.      Can only be called by the owner.*
 
 
 
@@ -278,15 +278,15 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 | previousOwner `indexed` | address | undefined |
 | newOwner `indexed` | address | undefined |
 
-### Swap
+### Redeem
 
 ```solidity
-event Swap(address sender, address recipient, uint256 amount, uint256 nonce, bool isRedeem)
+event Redeem(address sender, address recipient, uint256 amount, uint256 nonce, uint256 commission)
 ```
 
 
 
-*Triggers both upon `swap` and `redeem`.*
+*Triggers upon `redeem`.*
 
 #### Parameters
 
@@ -296,7 +296,26 @@ event Swap(address sender, address recipient, uint256 amount, uint256 nonce, boo
 | recipient  | address | undefined |
 | amount  | uint256 | undefined |
 | nonce  | uint256 | undefined |
-| isRedeem  | bool | undefined |
+| commission  | uint256 | undefined |
+
+### Swap
+
+```solidity
+event Swap(address sender, address recipient, uint256 amount, uint256 nonce)
+```
+
+
+
+*Triggers upon `swap`.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| sender  | address | undefined |
+| recipient  | address | undefined |
+| amount  | uint256 | undefined |
+| nonce  | uint256 | undefined |
 
 ### Withdrawal
 
@@ -306,7 +325,7 @@ event Withdrawal(address owner, uint256 amount)
 
 
 
-
+*Triggers upon `withdraw`.*
 
 #### Parameters
 

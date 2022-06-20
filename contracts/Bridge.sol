@@ -36,7 +36,7 @@ contract Bridge is EIP712, Ownable {
   /// @dev Typehash for EIP-712 compliant hashStruct.
   bytes32 public constant SWAP_TYPEHASH =
     keccak256(
-      "Swap(address sender,address recipient,uint256 amount,uint256 nonce,bool isRedeem)"
+      "Swap(address sender,address recipient,uint256 amount,uint256 nonce)"
     );
 
   /// @dev Type for hashStruct.
@@ -45,18 +45,26 @@ contract Bridge is EIP712, Ownable {
     address recipient;
     uint256 amount;
     uint256 nonce;
-    bool isRedeem;
   }
 
-  /// @dev Triggers both upon `swap` and `redeem`.
+  /// @dev Triggers upon `swap`.
   event Swap(
     address sender,
     address recipient,
     uint256 amount,
-    uint256 nonce,
-    bool isRedeem
+    uint256 nonce
   );
 
+  /// @dev Triggers upon `redeem`.
+  event Redeem(
+    address sender,
+    address recipient,
+    uint256 amount,
+    uint256 nonce,
+    uint256 commission
+  );
+
+  /// @dev Triggers upon `withdraw`.
   event Withdrawal(
     address owner,
     uint256 amount
@@ -98,7 +106,7 @@ contract Bridge is EIP712, Ownable {
   function swap(address _recepient, uint256 _amount) external {
     token.burn(msg.sender, _amount);
 
-    emit Swap(msg.sender, _recepient, _amount, nonce.current(), false);
+    emit Swap(msg.sender, _recepient, _amount, nonce.current());
 
     nonce.increment();
   }
@@ -124,8 +132,7 @@ contract Bridge is EIP712, Ownable {
       sender: _sender,
       recipient: msg.sender,
       amount: _amount,
-      nonce: _nonce,
-      isRedeem: true
+      nonce: _nonce
     });
 
     require(
@@ -143,15 +150,17 @@ contract Bridge is EIP712, Ownable {
     token.transfer(msg.sender, _amount - commission);
     totalCommissioned += commission;
 
-    emit Swap(
+    emit Redeem(
       _swap.sender,
       _swap.recipient,
       _amount - commission,
       _swap.nonce,
-      _swap.isRedeem
+      commission
     );
   }
 
+  /// @dev Withdraw all the commissioned tokens.
+  ///      Can only be called by the owner.
   function withdraw() external onlyOwner {
     token.transfer(msg.sender, totalCommissioned);
 
@@ -168,16 +177,10 @@ contract Bridge is EIP712, Ownable {
             _swap.sender,
             _swap.recipient,
             _swap.amount,
-            _swap.nonce,
-            _toUInt256(_swap.isRedeem)
+            _swap.nonce
           )
         )
       );
   }
 
-  function _toUInt256(bool x) internal pure returns (uint256 r) {
-    assembly {
-      r := x
-    }
-  }
 }
