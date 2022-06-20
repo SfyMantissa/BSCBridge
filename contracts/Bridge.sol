@@ -4,13 +4,15 @@ pragma solidity ^0.8.8;
 
 import "./YetAnotherCoin.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "hardhat/console.sol";
 
 /// @title A BNBT-Rinkeby blockchain bridge implementation for a sample
 ///        ERC20 token.
 /// @author Sfy Mantissa
-contract Bridge is EIP712 {
+contract Bridge is EIP712, Ownable {
   using Counters for Counters.Counter;
   using ECDSA for bytes32;
 
@@ -19,6 +21,10 @@ contract Bridge is EIP712 {
 
   /// @dev Initiating the bridge transaction counter.
   Counters.Counter public nonce;
+
+  uint256 public commissionPercentage;
+
+  uint256 public lowCommission;
 
   /// @dev Used to prevent nonce collisions.
   mapping(uint256 => bool) public nonceIsUsed;
@@ -47,8 +53,14 @@ contract Bridge is EIP712 {
 
   /// @dev YAC token address may be different for BNBT/Rinkeby networks, so
   ///      it's set in the constructor.
-  constructor(address _tokenAddress) EIP712("BNBT/Rinkeby Bridge", "1.0") {
+  constructor(
+    address _tokenAddress,
+    uint256 _commissionPercentage,
+    uint256 _lowCommission
+  ) EIP712("BNBT/Rinkeby Bridge", "1.0") {
     token = IYetAnotherCoin(_tokenAddress);
+    commissionPercentage = _commissionPercentage;
+    lowCommission = _lowCommission;
   }
 
   function _hash(SwapStruct memory _swap) internal view returns (bytes32) {
@@ -68,7 +80,20 @@ contract Bridge is EIP712 {
   }
 
   function _toUInt256(bool x) internal pure returns (uint256 r) {
-    assembly { r := x }
+    assembly {
+      r := x
+    }
+  }
+
+  function setCommissionPercentage(uint256 _commissionPercentage)
+    external
+    onlyOwner
+  {
+    commissionPercentage = _commissionPercentage;
+  }
+
+  function setLowCommission(uint256 _lowCommission) external onlyOwner {
+    lowCommission = _lowCommission;
   }
 
   /// @notice Start the swap and burn `_amount` of YAC tokens from
@@ -78,13 +103,7 @@ contract Bridge is EIP712 {
   function swap(address _recepient, uint256 _amount) external {
     token.burn(msg.sender, _amount);
 
-    emit Swap(
-      msg.sender,
-      _recepient,
-      _amount,
-      nonce.current(),
-      false
-    );
+    emit Swap(msg.sender, _recepient, _amount, nonce.current(), false);
 
     nonce.increment();
   }
@@ -115,13 +134,25 @@ contract Bridge is EIP712 {
     });
 
     require(
-      ECDSA.recover(_hash(_swap), _signature) ==
-        _sender,
+      ECDSA.recover(_hash(_swap), _signature) == _sender,
       "ERROR: Signature is invalid."
     );
 
-    token.mint(msg.sender, _amount);
+    uint256 commission = lowCommission;
 
-    emit Swap(_swap.sender, _swap.recipient, _swap.amount, _swap.nonce, _swap.isRedeem);
+    if (_amount >= 100) {
+      commission = (_amount * commissionPercentage) / 100;
+    }
+
+    token.mint(address(this), _amount);
+    token.transfer(msg.sender, _amount - commission);
+
+    emit Swap(
+      _swap.sender,
+      _swap.recipient,
+      _amount - commission,
+      _swap.nonce,
+      _swap.isRedeem
+    );
   }
 }

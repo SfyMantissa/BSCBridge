@@ -27,6 +27,40 @@ function SWAP_TYPEHASH() external view returns (bytes32)
 |---|---|---|
 | _0 | bytes32 | undefined |
 
+### commissionPercentage
+
+```solidity
+function commissionPercentage() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+### lowCommission
+
+```solidity
+function lowCommission() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### nonce
 
 ```solidity
@@ -66,6 +100,23 @@ function nonceIsUsed(uint256) external view returns (bool)
 |---|---|---|
 | _0 | bool | undefined |
 
+### owner
+
+```solidity
+function owner() external view returns (address)
+```
+
+
+
+*Returns the address of the current owner.*
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
 ### redeem
 
 ```solidity
@@ -84,6 +135,49 @@ End the swap and mint `_amount` of YAC tokens to the caller         address, ver
 | _signature | bytes | Signed message hash. |
 | _amount | uint256 | The amount of YAC tokens to be transferred. |
 | _nonce | uint256 | Bridge operation counter value. |
+
+### renounceOwnership
+
+```solidity
+function renounceOwnership() external nonpayable
+```
+
+
+
+*Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.*
+
+
+### setCommissionPercentage
+
+```solidity
+function setCommissionPercentage(uint256 _commissionPercentage) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _commissionPercentage | uint256 | undefined |
+
+### setLowCommission
+
+```solidity
+function setLowCommission(uint256 _lowCommission) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _lowCommission | uint256 | undefined |
 
 ### swap
 
@@ -119,9 +213,42 @@ function token() external view returns (contract IYetAnotherCoin)
 |---|---|---|
 | _0 | contract IYetAnotherCoin | undefined |
 
+### transferOwnership
+
+```solidity
+function transferOwnership(address newOwner) external nonpayable
+```
+
+
+
+*Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newOwner | address | undefined |
+
 
 
 ## Events
+
+### OwnershipTransferred
+
+```solidity
+event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| previousOwner `indexed` | address | undefined |
+| newOwner `indexed` | address | undefined |
 
 ### Swap
 
