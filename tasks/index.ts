@@ -6,3 +6,4 @@ import "./commissionPercentage";
 import "./lowCommission";
 import "./setCommissionPercentage";
 import "./setLowCommission";
+import "./withdraw";
