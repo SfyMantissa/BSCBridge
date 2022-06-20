@@ -5,12 +5,12 @@ pragma solidity ^0.8.8;
 import "./YetAnotherCoin.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 
 /// @title A BNBT-Rinkeby blockchain bridge implementation for a sample
-///        ERC20 token. 
+///        ERC20 token.
 /// @author Sfy Mantissa
-contract Bridge {
-
+contract Bridge is EIP712 {
   using Counters for Counters.Counter;
   using ECDSA for bytes32;
 
@@ -23,10 +23,23 @@ contract Bridge {
   /// @dev Used to prevent nonce collisions.
   mapping(uint256 => bool) public nonceIsUsed;
 
+  bytes32 public constant SWAP_TYPEHASH =
+    keccak256(
+      "Swap(address sender,address recipient,uint256 amount,uint256 nonce,bool isRedeem)"
+    );
+
+  struct SwapStruct {
+    address sender;
+    address recipient;
+    uint256 amount;
+    uint256 nonce;
+    bool isRedeem;
+  }
+
   /// @dev Triggers both upon `swap` and `redeem`.
-  event SwapInitialized (
+  event Swap(
     address sender,
-    address recepient,
+    address recipient,
     uint256 amount,
     uint256 nonce,
     bool isRedeem
@@ -34,20 +47,38 @@ contract Bridge {
 
   /// @dev YAC token address may be different for BNBT/Rinkeby networks, so
   ///      it's set in the constructor.
-  constructor(address _tokenAddress) {
+  constructor(address _tokenAddress) EIP712("BNBT/Rinkeby Bridge", "1.0") {
     token = IYetAnotherCoin(_tokenAddress);
+  }
+
+  function _hash(SwapStruct memory _swap) internal view returns (bytes32) {
+    return
+      _hashTypedDataV4(
+        keccak256(
+          abi.encode(
+            SWAP_TYPEHASH,
+            _swap.sender,
+            _swap.recipient,
+            _swap.amount,
+            _swap.nonce,
+            _toUInt256(_swap.isRedeem)
+          )
+        )
+      );
+  }
+
+  function _toUInt256(bool x) internal pure returns (uint256 r) {
+    assembly { r := x }
   }
 
   /// @notice Start the swap and burn `_amount` of YAC tokens from
   ///         the caller's address.
   /// @param _recepient The recepient's address.
   /// @param _amount The quantity of tokens to be burned in the first network.
-  function swap(address _recepient, uint256 _amount)
-    external
-  {
+  function swap(address _recepient, uint256 _amount) external {
     token.burn(msg.sender, _amount);
 
-    emit SwapInitialized(
+    emit Swap(
       msg.sender,
       _recepient,
       _amount,
@@ -58,7 +89,7 @@ contract Bridge {
     nonce.increment();
   }
 
-  /// @notice End the swap and mint `_amount` of YAC tokens to the caller 
+  /// @notice End the swap and mint `_amount` of YAC tokens to the caller
   ///         address, verifying the request with `_signature` and `_nounce`.
   /// @dev ECDSA library is used to check whether the transaction was signed
   ///      by the caller.
@@ -71,44 +102,26 @@ contract Bridge {
     bytes calldata _signature,
     uint256 _amount,
     uint256 _nonce
-  ) 
-    external
-  {
-
-    require(
-      nonceIsUsed[_nonce] == false, 
-      "ERROR: Nonce was used previously."
-    );
-
+  ) external {
+    require(nonceIsUsed[_nonce] == false, "ERROR: Nonce was used previously.");
     nonceIsUsed[_nonce] = true;
 
-    bytes32 signature = keccak256(
-      abi.encodePacked(
-        _sender,
-        msg.sender,
-        address(this),
-        _amount,
-        _nonce
-      )
-    );
+    SwapStruct memory _swap = SwapStruct({
+      sender: _sender,
+      recipient: msg.sender,
+      amount: _amount,
+      nonce: _nonce,
+      isRedeem: true
+    });
 
     require(
-      ECDSA.recover(
-        signature.toEthSignedMessageHash(),
-        _signature
-    ) == msg.sender,
+      ECDSA.recover(_hash(_swap), _signature) ==
+        _sender,
       "ERROR: Signature is invalid."
     );
 
     token.mint(msg.sender, _amount);
 
-    emit SwapInitialized(
-      _sender,
-      msg.sender,
-      _amount,
-      _nonce,
-      true
-    );
+    emit Swap(_swap.sender, _swap.recipient, _swap.amount, _swap.nonce, _swap.isRedeem);
   }
-
-} 
+}

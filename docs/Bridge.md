@@ -2,13 +2,30 @@
 
 *Sfy Mantissa*
 
-> A BNBT-Rinkeby blockchain bridge implementation for a sample        ERC20 token. 
+> A BNBT-Rinkeby blockchain bridge implementation for a sample        ERC20 token.
 
 
 
 
 
 ## Methods
+
+### SWAP_TYPEHASH
+
+```solidity
+function SWAP_TYPEHASH() external view returns (bytes32)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bytes32 | undefined |
 
 ### nonce
 
@@ -55,7 +72,7 @@ function nonceIsUsed(uint256) external view returns (bool)
 function redeem(address _sender, bytes _signature, uint256 _amount, uint256 _nonce) external nonpayable
 ```
 
-End the swap and mint `_amount` of YAC tokens to the caller          address, verifying the request with `_signature` and `_nounce`.
+End the swap and mint `_amount` of YAC tokens to the caller         address, verifying the request with `_signature` and `_nounce`.
 
 *ECDSA library is used to check whether the transaction was signed      by the caller.*
 
@@ -106,10 +123,10 @@ function token() external view returns (contract IYetAnotherCoin)
 
 ## Events
 
-### SwapInitialized
+### Swap
 
 ```solidity
-event SwapInitialized(address sender, address recepient, uint256 amount, uint256 nonce, bool isRedeem)
+event Swap(address sender, address recipient, uint256 amount, uint256 nonce, bool isRedeem)
 ```
 
 
@@ -121,7 +138,7 @@ event SwapInitialized(address sender, address recepient, uint256 amount, uint256
 | Name | Type | Description |
 |---|---|---|
 | sender  | address | undefined |
-| recepient  | address | undefined |
+| recipient  | address | undefined |
 | amount  | uint256 | undefined |
 | nonce  | uint256 | undefined |
 | isRedeem  | bool | undefined |
