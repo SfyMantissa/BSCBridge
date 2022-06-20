@@ -213,6 +213,23 @@ function token() external view returns (contract IYetAnotherCoin)
 |---|---|---|
 | _0 | contract IYetAnotherCoin | undefined |
 
+### totalCommissioned
+
+```solidity
+function totalCommissioned() external view returns (uint256)
+```
+
+
+
+*Total commissioned tokens stored on contract.*
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### transferOwnership
 
 ```solidity
@@ -228,6 +245,17 @@ function transferOwnership(address newOwner) external nonpayable
 | Name | Type | Description |
 |---|---|---|
 | newOwner | address | undefined |
+
+### withdraw
+
+```solidity
+function withdraw() external nonpayable
+```
+
+
+
+
+
 
 
 
@@ -269,6 +297,23 @@ event Swap(address sender, address recipient, uint256 amount, uint256 nonce, boo
 | amount  | uint256 | undefined |
 | nonce  | uint256 | undefined |
 | isRedeem  | bool | undefined |
+
+### Withdrawal
+
+```solidity
+event Withdrawal(address owner, uint256 amount)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| owner  | address | undefined |
+| amount  | uint256 | undefined |
 
 
 

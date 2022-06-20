@@ -9,6 +9,7 @@ describe("Bridge", () => {
   let bridge: Contract;
   let yetAnotherCoin: Contract;
   let owner: SignerWithAddress;
+  let totalCommissioned: number = 0;
   let domain: any;
   let types: any;
   let value: any;
@@ -93,6 +94,8 @@ describe("Bridge", () => {
         value.isRedeem
       );
 
+    totalCommissioned += parseFloat(commission);
+
     expect(
       await yetAnotherCoin.connect(owner).balanceOf(owner.address)
     ).to.equal(790 + value.amount - commission);
@@ -125,6 +128,8 @@ describe("Bridge", () => {
         value.isRedeem
       );
 
+    totalCommissioned += commission;
+
     expect(
       await yetAnotherCoin.connect(owner).balanceOf(owner.address)
     ).to.equal(799 + value.amount - commission);
@@ -154,5 +159,11 @@ describe("Bridge", () => {
     await expect(
       bridge.connect(owner).redeem(value.sender, signature, 10, value.nonce)
     ).to.be.revertedWith("ERROR: Signature is invalid.");
+  });
+
+  it("withdraw: should be able to withdraw the total accumulated commission", async () => {
+    await expect(bridge.connect(owner).withdraw())
+      .to.emit(bridge, "Withdrawal")
+      .withArgs(owner.address, totalCommissioned);
   });
 });

@@ -21,6 +21,9 @@ contract Bridge is EIP712, Ownable {
   /// @dev Initiating the bridge transaction counter.
   Counters.Counter public nonce;
 
+  /// @dev Total commissioned tokens stored on contract.
+  uint256 public totalCommissioned;
+
   /// @dev Commission percentage when swap amount >= 100 tokens.
   uint256 public commissionPercentage;
 
@@ -52,6 +55,11 @@ contract Bridge is EIP712, Ownable {
     uint256 amount,
     uint256 nonce,
     bool isRedeem
+  );
+
+  event Withdrawal(
+    address owner,
+    uint256 amount
   );
 
   /// @dev YAC token address may be different for BNBT/Rinkeby networks, so
@@ -133,6 +141,7 @@ contract Bridge is EIP712, Ownable {
 
     token.mint(address(this), _amount);
     token.transfer(msg.sender, _amount - commission);
+    totalCommissioned += commission;
 
     emit Swap(
       _swap.sender,
@@ -141,6 +150,13 @@ contract Bridge is EIP712, Ownable {
       _swap.nonce,
       _swap.isRedeem
     );
+  }
+
+  function withdraw() external onlyOwner {
+    token.transfer(msg.sender, totalCommissioned);
+
+    emit Withdrawal(msg.sender, totalCommissioned);
+    totalCommissioned = 0;
   }
 
   function _hash(SwapStruct memory _swap) internal view returns (bytes32) {
