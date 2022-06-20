@@ -17,10 +17,10 @@ A BNBT-Rinkeby blockchain bridge implementation for a sample ERC20 token.
 
 ## To do
 
-- [x] Use EIP712-compliant hashing
-- [ ] Use token pools instead of burn() and mint()
-- [ ] Take commissions for swaps
-- [x] Add sender and recipient
+- [x] Use EIP712-compliant signing.
+- [ ] Use token pools instead of burn() and mint().
+- [x] Take commissions for swaps.
+- [x] Add sender and recipient.
 
 ## Usage
 
