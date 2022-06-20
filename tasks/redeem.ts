@@ -22,18 +22,33 @@ task("redeem",
       throw "ERROR: Network must be Rinkeby or BNBT."
     }
 
+    const domain = {
+      name: "BNBT/Rinkeby Bridge",
+      version: "1.0",
+      chainId: network.chainId,
+      verifyingContract: bridgeAddress
+    };
+
+    const types = {
+      Swap: [
+        { name: "sender", type: "address" },
+        { name: "recipient", type: "address" },
+        { name: "amount", type: "uint256" },
+        { name: "nonce", type: "uint256" },
+      ],
+    };
+
+    const value = {
+      sender: args.sender,
+      recipient: signerArray[args.signer].address,
+      amount: args.amount,
+      nonce: args.nonce
+    };
+
+    let signature = await signerArray[args.signer]._signTypedData(domain, types, value);
+
     const Bridge = await ethers.getContractFactory("Bridge");
     const bridge = Bridge.attach(bridgeAddress);
-
-    let messageHash = ethers.utils.solidityKeccak256(
-      ["address", "address", "address", "uint256", "uint256"],
-      [args.sender, signerArray[args.signer].address, bridgeAddress,
-      args.amount, args.nonce]
-    );
-
-    let signature = await signerArray[args.signer].signMessage(
-      ethers.utils.arrayify(messageHash)
-    );
 
     const txRedeem = bridge.connect(signerArray[args.signer]).redeem(
       args.sender,
@@ -44,13 +59,15 @@ task("redeem",
 
     const rRedeem = await (await txRedeem).wait();
 
-    const sender = rRedeem.events[1].args[0];
-    const recepient = rRedeem.events[1].args[1];
-    const amount = rRedeem.events[1].args[2];
-    const nonce = rRedeem.events[1].args[3];
+    const sender = rRedeem.events[2].args[0];
+    const recepient = rRedeem.events[2].args[1];
+    const amount = rRedeem.events[2].args[2];
+    const nonce = rRedeem.events[2].args[3];
+    const commission = rRedeem.events[2].args[4];
 
     console.log("Finished the swap to " + network.name.toUpperCase() + " of "
       + amount + " YAC tokens by user " + sender + " to user " + recepient
-      + ".\n" + "Nonce was " + nonce + ".");
+      + ".\n" + "Nonce was " + nonce + ".\n" + "Commission is " + commission
+      + " YAC token(s).");
 
   });
